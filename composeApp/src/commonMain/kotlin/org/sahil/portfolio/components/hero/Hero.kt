@@ -16,22 +16,16 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,15 +40,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
-import org.sahil.portfolio.components.hero.HeroCompact
 import org.sahil.portfolio.util.WindowType
 import sahil_portfolio.composeapp.generated.resources.Res
-import sahil_portfolio.composeapp.generated.resources.assets
 import sahil_portfolio.composeapp.generated.resources.github
 import sahil_portfolio.composeapp.generated.resources.instagram
 import sahil_portfolio.composeapp.generated.resources.linkedin
 import sahil_portfolio.composeapp.generated.resources.sahil
-import sahil_portfolio.composeapp.generated.resources.aboutme
 
 @Composable
 fun HeroSection() {
@@ -78,16 +69,25 @@ fun HeroSection() {
     BoxWithConstraints {
         val windowType = WindowType.fromWidth(maxWidth)
         val maxWidthDp = maxWidth
-        Column(modifier = Modifier.padding(24.dp).padding(top = 120.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        val topPadding = when (windowType) {
+            WindowType.Compact -> 40.dp
+            else -> 120.dp
+        }
+        Column(
+            modifier = Modifier.padding(24.dp).padding(top = topPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             when (windowType) {
                 WindowType.Compact -> HeroCompact(
                     offsetYPx = offsetYPx,
                     maxWidthDp
                 )
+
                 WindowType.Expanded -> HeroExpanded(
                     offsetYPx = offsetYPx
                 )
             }
+            Spacer(modifier = Modifier.height(80.dp))
         }
 
     }
@@ -95,14 +95,18 @@ fun HeroSection() {
 
 @Composable
 fun HeroCompact(offsetYPx: Float, imageWidth: Dp) {
-    Column (
+    Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        HeroInfo(modifier = Modifier.padding(end = 30.dp), style = MaterialTheme.typography.displaySmall)
+        HeroInfo(
+            modifier = Modifier.padding(end = 30.dp),
+            style = MaterialTheme.typography.displaySmall
+        )
         Spacer(modifier = Modifier.height(40.dp))
         HeroImage(offsetYPx = offsetYPx, modifier = Modifier.width(imageWidth))
     }
 }
+
 @Composable
 fun HeroExpanded(offsetYPx: Float) {
     Row(
@@ -115,7 +119,10 @@ fun HeroExpanded(offsetYPx: Float) {
 }
 
 @Composable
-fun HeroInfo(modifier: Modifier = Modifier, style:  TextStyle = MaterialTheme.typography.displayLarge) {
+fun HeroInfo(
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.displayLarge
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.Start

@@ -12,6 +12,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,8 +34,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
+import org.sahil.portfolio.util.WindowType
 import sahil_portfolio.composeapp.generated.resources.Res
 import sahil_portfolio.composeapp.generated.resources.aboutme
 
@@ -54,20 +57,55 @@ fun AboutMe() {
             }
             Box(modifier = Modifier.width(100.dp).height(3.dp).clip(RoundedCornerShape(2.dp)).background(MaterialTheme.colorScheme.primary))
         }
-        Spacer(modifier = Modifier.height(80.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(25.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AboutMeImage()
-            AboutMeText()
-        }
+
+            BoxWithConstraints{
+                val windowType = WindowType.fromWidth(maxWidth)
+                val topPadding = when (windowType) {
+                    WindowType.Compact -> 40.dp
+                    else -> 90.dp
+                }
+                Column {
+                    Spacer(modifier = Modifier.height(topPadding))
+
+                    when (windowType) {
+                        WindowType.Compact -> AboutMeCompact()
+                        else -> AboutMeExpanded()
+                    }
+                }
+
+            }
     }
 }
 
 @Composable
-fun AboutMeImage() {
+fun AboutMeExpanded() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(25.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        AboutMeImage()
+        AboutMeText()
+    }
+}
+
+@Composable
+fun AboutMeCompact() {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(18.dp)
+    ) {
+        AboutMeImage(modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(24.dp))
+        AboutMeText()
+    }
+}
+
+@Composable
+fun AboutMeImage(
+    modifier: Modifier = Modifier
+) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -84,13 +122,13 @@ fun AboutMeImage() {
     )
 
     Box {
-        Box(modifier = Modifier.padding(top = 16.dp, start = 16.dp).border(
+        Box(modifier = modifier.padding(top = 16.dp, start = 16.dp).border(
             BorderStroke(width = 1.5.dp, color = MaterialTheme.colorScheme.primary), RoundedCornerShape(22.dp)
-        ).height(360.dp).width(640.dp).clip(RoundedCornerShape(22.dp)).background(boxBg))
+        ).height(360.dp).fillMaxWidth(0.5f).clip(RoundedCornerShape(22.dp)).background(boxBg))
         Image(
             painter = painterResource(Res.drawable.aboutme),
             contentDescription = null,
-            modifier = Modifier.graphicsLayer(scaleX = scale, scaleY = scale).height(360.dp).width(640.dp).clip(RoundedCornerShape(22.dp)).clickable(interactionSource = interactionSource, indication = null) {},
+            modifier = modifier.graphicsLayer(scaleX = scale, scaleY = scale).height(360.dp).padding(end = 16.dp).fillMaxWidth(0.5f).clip(RoundedCornerShape(22.dp)).clickable(interactionSource = interactionSource, indication = null) {},
             contentScale = ContentScale.Crop
         )
     }
@@ -98,11 +136,12 @@ fun AboutMeImage() {
 }
 
 @Composable
-fun AboutMeText() {
+fun AboutMeText(modifier: Modifier = Modifier) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = modifier.fillMaxWidth(1f)
     ) {
-        Text("Mobile App Developer", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
+        Text("Mobile App Developer", style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
         Text("I'm Sahil Karwasra, a passionate Mobile App Developer with expertise in creating beautiful, functional, and user-friendly mobile applications. With a strong foundation in Kotlin, Flutter, and various backend technologies, I bring ideas to life through clean code and intuitive design.",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground.copy(0.5f)

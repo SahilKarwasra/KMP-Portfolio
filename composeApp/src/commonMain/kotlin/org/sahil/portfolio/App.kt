@@ -29,8 +29,9 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.sahil.portfolio.components.AnimatedBackground
 import org.sahil.portfolio.components.aboutme.AboutMe
+import org.sahil.portfolio.components.experience.ExperienceSection
 import org.sahil.portfolio.components.hero.HeroSection
-import org.sahil.portfolio.components.skills.Skills
+import org.sahil.portfolio.components.skills.SkillsSection
 import org.sahil.portfolio.components.topBar.CompactDrawerContent
 import org.sahil.portfolio.components.topBar.TopAppBar
 import org.sahil.portfolio.components.topBar.TopAppBarSection
@@ -96,12 +97,13 @@ fun App() {
                             MaxWidthContainer {
                                 LazyColumn(
                                     modifier = Modifier.fillMaxSize().padding(it).nestedScroll(scrollBehavior.nestedScrollConnection),
-                                    verticalArrangement = Arrangement.spacedBy(120.dp),
+                                    verticalArrangement = Arrangement.spacedBy(40.dp),
                                     state = scrollState
                                 ) {
-                                    item { HeroSection() }
-                                    item { AboutMe() }
-                                    item { Skills() }
+                                    item("Hero") { HeroSection() }
+                                    item("About") { AboutMe() }
+                                    item("Skills") { SkillsSection() }
+                                    item("Experience") { ExperienceSection() }
                                 }
                             }
                         }
