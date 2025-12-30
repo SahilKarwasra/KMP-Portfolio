@@ -14,6 +14,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +33,7 @@ import org.sahil.portfolio.components.AnimatedBackground
 import org.sahil.portfolio.components.aboutme.AboutMe
 import org.sahil.portfolio.components.experience.ExperienceSection
 import org.sahil.portfolio.components.hero.HeroSection
+import org.sahil.portfolio.components.project.ProjectsSection
 import org.sahil.portfolio.components.skills.SkillsSection
 import org.sahil.portfolio.components.topBar.CompactDrawerContent
 import org.sahil.portfolio.components.topBar.TopAppBar
@@ -41,7 +44,7 @@ import org.sahil.portfolio.util.MaxWidthContainer
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
-    var isDark by rememberSaveable { mutableStateOf(false) }
+    var isDark by rememberSaveable { mutableStateOf(true) }
     AppTheme(isDark) {
         var selectedSection by remember { mutableStateOf(TopAppBarSection.Home) }
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -50,6 +53,37 @@ fun App() {
 
         val scrollState = rememberLazyListState()
         val scope = rememberCoroutineScope()
+
+        // Map sections to their indices
+        val sectionIndices = remember {
+            mapOf(
+                TopAppBarSection.Home to 0,
+                TopAppBarSection.About to 1,
+                TopAppBarSection.Skills to 2,
+                TopAppBarSection.Experience to 3,
+                TopAppBarSection.Project to 4
+            )
+        }
+
+        // Update selected section based on scroll position
+        val currentSection by remember {
+            derivedStateOf {
+                val firstVisibleIndex = scrollState.firstVisibleItemIndex
+                when (firstVisibleIndex) {
+                    0 -> TopAppBarSection.Home
+                    1 -> TopAppBarSection.About
+                    2 -> TopAppBarSection.Skills
+                    3 -> TopAppBarSection.Experience
+                    4 -> TopAppBarSection.Project
+                    else -> TopAppBarSection.Home
+                }
+            }
+        }
+
+        // Update selectedSection when scrolling
+        LaunchedEffect(currentSection) {
+            selectedSection = currentSection
+        }
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             ModalNavigationDrawer(
@@ -62,7 +96,8 @@ fun App() {
                                 selectedSection = it
                                 scope.launch {
                                     drawerState.close()
-                                    scrollState.animateScrollToItem(selectedSection.ordinal)
+                                    val index = sectionIndices[it] ?: 0
+                                    scrollState.animateScrollToItem(index)
                                 }
                             },
                             onHireMeClick = {}
@@ -74,14 +109,16 @@ fun App() {
                     Box {
                         AnimatedBackground(isDark = isDark)
                         Scaffold(
-                            containerColor = Color.Transparent, topBar = {
+                            containerColor = Color.Transparent,
+                            topBar = {
                                 MaxWidthContainer {
                                     TopAppBar(
                                         selectedSection = selectedSection,
                                         onSectionClick = {
                                             selectedSection = it
                                             scope.launch {
-                                                scrollState.animateScrollToItem(selectedSection.ordinal)
+                                                val index = sectionIndices[it] ?: 0
+                                                scrollState.animateScrollToItem(index)
                                             }
                                         },
                                         isDark = isDark,
@@ -93,17 +130,22 @@ fun App() {
                                         }
                                     )
                                 }
-                            }) {
+                            }
+                        ) {
                             MaxWidthContainer {
                                 LazyColumn(
-                                    modifier = Modifier.fillMaxSize().padding(it).nestedScroll(scrollBehavior.nestedScrollConnection),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(it)
+                                        .nestedScroll(scrollBehavior.nestedScrollConnection),
                                     verticalArrangement = Arrangement.spacedBy(40.dp),
                                     state = scrollState
                                 ) {
-                                    item("Hero") { HeroSection() }
-                                    item("About") { AboutMe() }
-                                    item("Skills") { SkillsSection() }
-                                    item("Experience") { ExperienceSection() }
+                                    item(key = "Hero") { HeroSection() }
+                                    item(key = "About") { AboutMe() }
+                                    item(key = "Skills") { SkillsSection() }
+                                    item(key = "Experience") { ExperienceSection() }
+                                    item(key = "Projects") { ProjectsSection() }
                                 }
                             }
                         }

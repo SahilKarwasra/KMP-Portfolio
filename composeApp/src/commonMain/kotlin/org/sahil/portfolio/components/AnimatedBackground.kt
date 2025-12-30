@@ -189,9 +189,9 @@ private fun AnimatedParticle(
         animationSpec = infiniteRepeatable(
             animation = keyframes {
                 durationMillis = (15000 + particle.delay * 1000).toInt()
-                0f at 0 with EaseInOut
-                1f at (durationMillis * 0.5f).toInt() with EaseInOut
-                0f at durationMillis with EaseInOut
+                0f at 0 using EaseInOut
+                1f at (durationMillis * 0.5f).toInt() using EaseInOut
+                0f at durationMillis using EaseInOut
             },
             repeatMode = RepeatMode.Restart,
             initialStartOffset = StartOffset((particle.delay * 1000).toInt())
