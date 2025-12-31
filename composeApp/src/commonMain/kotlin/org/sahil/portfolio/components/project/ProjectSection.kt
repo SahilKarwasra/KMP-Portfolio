@@ -56,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -304,8 +305,9 @@ private fun ProjectsContent(
                             initialOffsetY = { 20 }
                         )
             ) {
+                val uriHandler = LocalUriHandler.current
                 OutlinedButton(
-                    onClick = {  },
+                    onClick = { uriHandler.openUri("https://github.com/sahilkarwasra")},
                     modifier = Modifier.height(48.dp),
                     contentPadding = PaddingValues(horizontal = 24.dp)
                 ) {
@@ -435,8 +437,10 @@ private fun ProjectCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    val uriHandler = LocalUriHandler.current
+
                     OutlinedButton(
-                        onClick = {  },
+                        onClick = {uriHandler.openUri(project.githubLink)},
                         shape = RoundedCornerShape(6.dp),
                         modifier = Modifier.height(36.dp)
                     ) {
@@ -450,7 +454,7 @@ private fun ProjectCard(
                     }
 
                     Button(
-                        onClick = {  },
+                        onClick = {uriHandler.openUri(project.githubLink)},
                         modifier = Modifier.height(36.dp),
                         shape = RoundedCornerShape(6.dp),
                         colors = ButtonDefaults.buttonColors(

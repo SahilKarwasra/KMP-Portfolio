@@ -49,26 +49,6 @@ data class SocialLink(
 fun FooterSection(modifier: Modifier = Modifier) {
     val uriHandler = LocalUriHandler.current
 
-    val socialLinks = remember {
-        listOf(
-            SocialLink(
-                platform = "GitHub",
-                url = "https://github.com/sahilkarwasra",
-                icon = Icons.Default.Code
-            ),
-            SocialLink(
-                platform = "LinkedIn",
-                url = "https://linkedin.com/in/sahilkarwasra",
-                icon = Icons.Default.Person
-            ),
-            SocialLink(
-                platform = "Instagram",
-                url = "https://instagram.com/karwasra_sahil11",
-                icon = Icons.Default.Photo
-            )
-        )
-    }
-
     BoxWithConstraints(
         modifier = modifier.fillMaxWidth()
     ) {
