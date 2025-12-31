@@ -49,6 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -186,8 +187,16 @@ private fun ProjectsContent(
                 .padding(horizontal = if (windowType == WindowType.Expanded) 24.dp else 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var visible by remember { mutableStateOf(false) }
-            LaunchedEffect(Unit) { visible = true }
+            val hasAnimated = rememberSaveable("projects_section_animated") {
+                mutableStateOf(false)
+            }
+            val visible = true
+
+            LaunchedEffect(Unit) {
+                if (!hasAnimated.value) {
+                    hasAnimated.value = true
+                }
+            }
 
             AnimatedVisibility(
                 visible = visible,
@@ -257,11 +266,17 @@ private fun ProjectsContent(
                 maxItemsInEachRow = columns
             ) {
                 projects.forEachIndexed { index, project ->
-                    val itemVisible = remember { mutableStateOf(false) }
-                    LaunchedEffect(Unit) {
-                        delay(100L * index)
-                        itemVisible.value = true
+                    val itemVisible = rememberSaveable(project.title) {
+                        mutableStateOf(hasAnimated.value)
                     }
+
+                    LaunchedEffect(hasAnimated.value) {
+                        if (hasAnimated.value && !itemVisible.value) {
+                            delay(100L * index)
+                            itemVisible.value = true
+                        }
+                    }
+
 
                     AnimatedVisibility(
                         visible = itemVisible.value,

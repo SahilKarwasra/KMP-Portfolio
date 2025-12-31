@@ -1,11 +1,15 @@
 package org.sahil.portfolio.components.hero
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -29,13 +33,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -48,7 +56,7 @@ import sahil_portfolio.composeapp.generated.resources.linkedin
 import sahil_portfolio.composeapp.generated.resources.sahil
 
 @Composable
-fun HeroSection() {
+fun HeroSection(contactMeClick: () -> Unit) {
     val infiniteTransition = rememberInfiniteTransition(label = "floating")
 
     val offsetY by infiniteTransition.animateFloat(
@@ -66,41 +74,65 @@ fun HeroSection() {
     val density = LocalDensity.current
     val offsetYPx = with(density) { offsetY.dp.toPx() }
 
-    BoxWithConstraints {
-        val windowType = WindowType.fromWidth(maxWidth)
-        val maxWidthDp = maxWidth
-        val topPadding = when (windowType) {
-            WindowType.Compact -> 40.dp
-            else -> 120.dp
-        }
-        Column(
-            modifier = Modifier.padding(24.dp).padding(top = topPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (windowType) {
-                WindowType.Compact -> HeroCompact(
-                    offsetYPx = offsetYPx,
-                    maxWidthDp
-                )
+    val hasShown = rememberSaveable("hero_has_shown") {
+        mutableStateOf(false)
+    }
 
-                WindowType.Expanded -> HeroExpanded(
-                    offsetYPx = offsetYPx
+    val visible = hasShown.value
+
+    LaunchedEffect(Unit) {
+        if (!hasShown.value) {
+            hasShown.value = true
+        }
+    }
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(animationSpec = tween(700)) +
+                slideInVertically(
+                    animationSpec = tween(700),
+                    initialOffsetY = { 40 }
                 )
+    ) {
+
+        BoxWithConstraints {
+            val windowType = WindowType.fromWidth(maxWidth)
+            val maxWidthDp = maxWidth
+            val topPadding = when (windowType) {
+                WindowType.Compact -> 40.dp
+                else -> 120.dp
             }
-            Spacer(modifier = Modifier.height(80.dp))
-        }
+            Column(
+                modifier = Modifier.padding(24.dp).padding(top = topPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                when (windowType) {
+                    WindowType.Compact -> HeroCompact(
+                        offsetYPx = offsetYPx,
+                        maxWidthDp,
+                        onContactMeClick = contactMeClick
+                    )
 
+                    WindowType.Expanded -> HeroExpanded(
+                        offsetYPx = offsetYPx,
+                        onContactMeClick = contactMeClick
+                    )
+                }
+                Spacer(modifier = Modifier.height(80.dp))
+            }
+
+        }
     }
 }
 
 @Composable
-fun HeroCompact(offsetYPx: Float, imageWidth: Dp) {
+fun HeroCompact(offsetYPx: Float, imageWidth: Dp,onContactMeClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HeroInfo(
             modifier = Modifier.padding(end = 30.dp),
-            style = MaterialTheme.typography.displaySmall
+            style = MaterialTheme.typography.displaySmall,
+            onContactMeClick = onContactMeClick
         )
         Spacer(modifier = Modifier.height(40.dp))
         HeroImage(offsetYPx = offsetYPx, modifier = Modifier.width(imageWidth))
@@ -108,11 +140,11 @@ fun HeroCompact(offsetYPx: Float, imageWidth: Dp) {
 }
 
 @Composable
-fun HeroExpanded(offsetYPx: Float) {
+fun HeroExpanded(offsetYPx: Float, onContactMeClick: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        HeroInfo(modifier = Modifier.weight(1f))
+        HeroInfo(modifier = Modifier.weight(1f), onContactMeClick = onContactMeClick)
         Spacer(modifier = Modifier.width(36.dp))
         HeroImage(offsetYPx = offsetYPx, modifier = Modifier.weight(1f))
     }
@@ -121,7 +153,8 @@ fun HeroExpanded(offsetYPx: Float) {
 @Composable
 fun HeroInfo(
     modifier: Modifier = Modifier,
-    style: TextStyle = MaterialTheme.typography.displayLarge
+    style: TextStyle = MaterialTheme.typography.displayLarge,
+    onContactMeClick: () -> Unit
 ) {
     Column(
         modifier = modifier,
@@ -152,7 +185,7 @@ fun HeroInfo(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Row {
-            Button(onClick = {}, shape = RoundedCornerShape(12.dp)) {
+            Button(onClick = onContactMeClick, shape = RoundedCornerShape(12.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -192,12 +225,13 @@ fun HeroInfo(
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
+        val uriHandler = LocalUriHandler.current
         Row {
-            HeroSocialIcons(Res.drawable.github)
-            Spacer(modifier = Modifier.width(12.dp))
-            HeroSocialIcons(Res.drawable.linkedin)
-            Spacer(modifier = Modifier.width(12.dp))
-            HeroSocialIcons(Res.drawable.instagram)
+            HeroSocialIcons(Res.drawable.github, onClick = {uriHandler.openUri("https://github.com/sahilkarwasra")})
+            Spacer(modifier = Modifier.width(16.dp))
+            HeroSocialIcons(Res.drawable.linkedin, onClick = {uriHandler.openUri("https://linkedin.com/in/sahilkarwasra")})
+            Spacer(modifier = Modifier.width(16.dp))
+            HeroSocialIcons(Res.drawable.instagram, onClick = {uriHandler.openUri("https://instagram.com/karwasra_sahil11")})
         }
     }
 }

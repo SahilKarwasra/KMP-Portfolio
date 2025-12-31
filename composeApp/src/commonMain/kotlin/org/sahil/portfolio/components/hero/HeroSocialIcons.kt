@@ -29,13 +29,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun HeroSocialIcons(icon: DrawableResource) {
+fun HeroSocialIcons(icon: DrawableResource, iconSize: Dp = 18.dp, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -51,13 +52,13 @@ fun HeroSocialIcons(icon: DrawableResource) {
         label = "hoverBg"
     )
 
-    Box(modifier = Modifier.graphicsLayer(scaleX = scale, scaleY = scale).hoverable(interactionSource = interactionSource).clip(CircleShape).background(boxBg), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.graphicsLayer(scaleX = scale, scaleY = scale).hoverable(interactionSource = interactionSource).clip(CircleShape).background(boxBg).clickable(interactionSource = interactionSource, indication = null) {onClick()}, contentAlignment = Alignment.Center) {
         Image(
             painter = painterResource(icon),
             null,
             modifier = Modifier
                 .padding(6.dp)
-                .size(18.dp),
+                .size(iconSize),
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
         )
     }

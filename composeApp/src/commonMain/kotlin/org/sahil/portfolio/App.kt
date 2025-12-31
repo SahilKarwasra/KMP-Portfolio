@@ -31,8 +31,11 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.sahil.portfolio.components.AnimatedBackground
 import org.sahil.portfolio.components.aboutme.AboutMe
+import org.sahil.portfolio.components.contact.ContactSection
 import org.sahil.portfolio.components.experience.ExperienceSection
+import org.sahil.portfolio.components.footer.FooterSection
 import org.sahil.portfolio.components.hero.HeroSection
+import org.sahil.portfolio.components.myServices.ServicesSection
 import org.sahil.portfolio.components.project.ProjectsSection
 import org.sahil.portfolio.components.skills.SkillsSection
 import org.sahil.portfolio.components.topBar.CompactDrawerContent
@@ -61,7 +64,9 @@ fun App() {
                 TopAppBarSection.About to 1,
                 TopAppBarSection.Skills to 2,
                 TopAppBarSection.Experience to 3,
-                TopAppBarSection.Project to 4
+                TopAppBarSection.Project to 4,
+                TopAppBarSection.Services to 5,
+                TopAppBarSection.Contact to 6
             )
         }
 
@@ -75,6 +80,8 @@ fun App() {
                     2 -> TopAppBarSection.Skills
                     3 -> TopAppBarSection.Experience
                     4 -> TopAppBarSection.Project
+                    5 -> TopAppBarSection.Services
+                    6 -> TopAppBarSection.Contact
                     else -> TopAppBarSection.Home
                 }
             }
@@ -141,11 +148,19 @@ fun App() {
                                     verticalArrangement = Arrangement.spacedBy(40.dp),
                                     state = scrollState
                                 ) {
-                                    item(key = "Hero") { HeroSection() }
+                                    item(key = "Hero") { HeroSection(contactMeClick = {
+                                        scope.launch {
+                                            val index = sectionIndices[TopAppBarSection.Contact] ?: 0
+                                            scrollState.animateScrollToItem(index)
+
+                                        }
+                                    }) }
                                     item(key = "About") { AboutMe() }
                                     item(key = "Skills") { SkillsSection() }
                                     item(key = "Experience") { ExperienceSection() }
                                     item(key = "Projects") { ProjectsSection() }
+                                    item(key = "Services") { ServicesSection() }
+                                    item(key = "Contact") {ContactSection() }
                                 }
                             }
                         }
