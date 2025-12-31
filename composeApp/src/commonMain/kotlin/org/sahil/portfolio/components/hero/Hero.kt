@@ -199,8 +199,11 @@ fun HeroInfo(
                 }
             }
             Spacer(modifier = Modifier.width(12.dp))
+            val uriHandler = LocalUriHandler.current
             Button(
-                onClick = {},
+                onClick = {
+                    uriHandler.openUri("https://drive.google.com/file/d/1UoqFWIDntRKUr8Q6LCynn30fq-iado_p/view?usp=sharing")
+                },
                 shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(
                     width = 1.dp,

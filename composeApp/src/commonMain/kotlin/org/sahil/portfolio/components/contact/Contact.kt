@@ -176,8 +176,7 @@ fun ContactSection(modifier: Modifier = Modifier) {
                 CTACard(
                     windowType = windowType,
                     onResumeClick = {
-                        // Replace with your actual resume URL
-                        uriHandler.openUri("https://your-resume-url.com")
+                        uriHandler.openUri("https://drive.google.com/file/d/1UoqFWIDntRKUr8Q6LCynn30fq-iado_p/view?usp=sharing")
                     }
                 )
                 Spacer(modifier = Modifier.height(64.dp))

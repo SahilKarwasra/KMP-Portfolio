@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -91,6 +92,17 @@ fun App() {
         LaunchedEffect(currentSection) {
             selectedSection = currentSection
         }
+        val appBarAlpha by remember {
+            derivedStateOf {
+                val offset = scrollBehavior.state.contentOffset
+                when {
+                    offset <= 0f -> 0f
+                    offset in 0f..50f -> 0.05f
+                    else -> 0.05f
+                }
+            }
+        }
+        val uriHandler = LocalUriHandler.current
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             ModalNavigationDrawer(
@@ -107,7 +119,9 @@ fun App() {
                                     scrollState.animateScrollToItem(index)
                                 }
                             },
-                            onHireMeClick = {}
+                            onHireMeClick = {
+                                uriHandler.openUri("https://drive.google.com/file/d/1UoqFWIDntRKUr8Q6LCynn30fq-iado_p/view?usp=sharing")
+                            }
                         )
                     }
                 },
@@ -131,10 +145,13 @@ fun App() {
                                         isDark = isDark,
                                         toggleDarkTheme = { isDark = it },
                                         scrollBehavior = scrollBehavior,
-                                        onHireMeClick = {},
+                                        onHireMeClick = {
+                                            uriHandler.openUri("https://drive.google.com/file/d/1UoqFWIDntRKUr8Q6LCynn30fq-iado_p/view?usp=sharing")
+                                        },
                                         onMenuClick = {
                                             scope.launch { drawerState.open() }
-                                        }
+                                        },
+                                        backgroundAlpha = appBarAlpha
                                     )
                                 }
                             }

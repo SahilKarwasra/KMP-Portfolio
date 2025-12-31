@@ -33,7 +33,8 @@ fun TopAppBar(
     toggleDarkTheme: (Boolean) -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     onHireMeClick: () -> Unit,
-    onMenuClick: () -> Unit
+    onMenuClick: () -> Unit,
+    backgroundAlpha: Float
 ) {
     val icon = if (isDark) Icons.Outlined.Nightlight else Icons.Outlined.WbSunny
     val rotation by animateFloatAsState(
@@ -53,7 +54,9 @@ fun TopAppBar(
     )
     BoxWithConstraints {
         val windowType = WindowType.fromWidth(maxWidth)
-
+        val containerColor = MaterialTheme.colorScheme.background.copy(
+            alpha = backgroundAlpha
+        )
         TopAppBar(
             scrollBehavior = scrollBehavior,
             colors = TopAppBarDefaults.topAppBarColors(
